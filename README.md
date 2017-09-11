@@ -1,0 +1,2 @@
+# powershell_windows
+windows下使用powershell进行SIT测试得脚本
