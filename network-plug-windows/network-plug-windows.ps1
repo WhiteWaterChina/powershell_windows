@@ -367,7 +367,7 @@ $DEV_name_out_temp_2=1
 $DEV_name_in_temp_1=1
 $DEV_name_in_temp_2=1
 [string]$log_dir_name=Get-Date -Format yyyymmdd_hhmmss
-New-Item -Name $log_dir_name -ItemType Directory -Force
+$null=New-Item -Name $log_dir_name -ItemType Directory -Force
 #clear eventlog
 Clear-EventLog -LogName System 
 #generate baseline
