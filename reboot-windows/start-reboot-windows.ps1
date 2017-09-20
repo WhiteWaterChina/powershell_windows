@@ -1,8 +1,7 @@
 ﻿<#
 Reboot scripts!
 Log information and check every cycle!
-Author:Ward Yan
-Email: yanshuo@inspur.com
+Author:yanshuo@inspur.com
 #>
 [CmdletBinding()]
 param
@@ -136,19 +135,19 @@ Out-File -Force -Append "$log_dir\base_disk_serialnumber.log"
 #show network info
 Write-Host "Below are the information about Physical Network!" -ForegroundColor Green
 Get-WmiObject win32_networkadapter|where {$_.physicaladapter -eq "True"}|Sort-Object -Property deviceid|Format-Table -Property Deviceid,
-@{name='name';expression=({$_.name})},
+@{name='name';expression={$_.name}},
 @{name='macaddress';expression=({$_.macaddress})},
-@{name='speed(Gb)';expression=({$_.speed /1GB -as [int]})},
-@{name='guid';expression=({$_.guid})},
-@{name='Manufacturer';expression=({$_.Manufacturer})},
-@{name='Driver name';expression=({$_.ServiceName})},
-@{name='enabled or not';expression=({$_.netenabled})}
+@{name='speed(bits)';expression={if($_.netenabled -eq "True"){$_.speed}else{"None"}}},
+@{name='guid';expression={$_.guid}},
+@{name='Manufacturer';expression={$_.Manufacturer}},
+@{name='Driver name';expression={$_.ServiceName}},
+@{name='enabled or not';expression={$_.netenabled}}
 
 echo "Netork Information"|Out-File -Force -Append "$log_dir\reboot.log"
 (Get-WmiObject win32_networkadapter|where {$_.physicaladapter -eq "True"}|Sort-Object -Property deviceid|Format-Table -Property Deviceid,
 @{name='name';expression=({$_.name})},
 @{name='macaddress';expression=({$_.macaddress})},
-@{name='speed(Gb)';expression=({$_.speed /1GB -as [int]})},
+@{name='speed(bits)';expression={if($_.netenabled -eq "True"){$_.speed}else{"None"}}},
 @{name='guid';expression=({$_.guid})},
 @{name='Manufacturer';expression=({$_.Manufacturer})},
 @{name='Driver name';expression=({$_.ServiceName})},
@@ -288,7 +287,7 @@ echo "Netork Information"|Out-File -Force -Append "$log_dir\reboot.log"
 (Get-WmiObject win32_networkadapter|where {$_.physicaladapter -eq "True"}|Sort-Object -Property deviceid|Format-Table -Property deviceid,
 @{name='name';expression=({$_.name})},
 @{name='macaddress';expression=({$_.macaddress})},
-@{name='speed(Gb)';expression=({$_.speed /1GB -as [int]})},
+@{name='speed(bits)';expression={if($_.netenabled -eq "True"){$_.speed}else{"None"}}},
 @{name='guid';expression=({$_.guid})},
 @{name='Manufacturer';expression=({$_.Manufacturer})},
 @{name='Driver name';expression=({$_.ServiceName})},
