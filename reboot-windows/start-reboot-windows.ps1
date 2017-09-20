@@ -1,7 +1,8 @@
 ﻿<#
 Reboot scripts!
 Log information and check every cycle!
-Author:yanshuo@inspur.com
+Author:Ward Yan
+Email: yanshuo@inspur.com
 #>
 [CmdletBinding()]
 param
