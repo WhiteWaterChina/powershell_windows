@@ -172,9 +172,9 @@ Out-File -Force -Append "$log_dir\base_net_servicename.log"
 
 function generate_script ()
 {
-echo "@echo off"|Out-File -Encoding ascii reboot.cmd
-echo "PowerShell -Command Set-ExecutionPolicy Unrestricted"|Out-File -Encoding ascii -Append reboot.cmd
-echo "PowerShell C:\reboot.ps1"|Out-File -Encoding ascii -Append reboot.cmd
+echo "@echo off"|Out-File -Encoding ascii -Append -Force reboot.cmd
+{PowerShell -Command Set-ExecutionPolicy Unrestricted -scope currentuser}|Out-File -Encoding ascii -Append -Force  reboot.cmd
+{Powershell -noprofile -NoExit -command "&{start-process powershell -ArgumentList '-noprofile -file C:\reboot.ps1' -verb RunAs}"}|Out-File -Encoding ascii -Append -Force -NoNewline reboot.cmd
 {
 #get log dir path
 $log_dir=Get-Content "c:\logdir_path.log"
@@ -182,7 +182,7 @@ $log_dir=Get-Content "c:\logdir_path.log"
 [int]$current_loop = Get-Content "$log_dir\current_loop.log"
 [int]$total_count=Get-Content "$log_dir\loop_count_expect.txt"
 $time_sleep_sub=Get-Content "$log_dir\sleeptime.txt"
-$reboot_type=Get-Content "c:\reboot-type.log"
+$reboot_type=Get-Content "c:\reboot_type.log"
 if ($current_loop -lt $total_count)
 {
 Start-Sleep -Seconds $time_sleep_sub
@@ -675,7 +675,7 @@ echo "reboot"|Out-File -Encoding ascii -Force "c:\reboot_type.log"
 }
 elseif ($type_reboot -eq "2")
 {
-echo "dcac"|Out-File -Encoding ascii -Force "c:\reboot-type.log"
+echo "dcac"|Out-File -Encoding ascii -Force "c:\reboot_type.log"
 }
 else
 {
