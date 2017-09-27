@@ -1,1 +1,1 @@
-﻿Remove-Item -Path C:\Users\Administrator\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\reboot.cmd -Force -ErrorAction SilentlyContinue
+﻿Remove-Item -Path "C:\Users\Administrator\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\reboot.cmd" -Force -ErrorAction SilentlyContinue

@@ -3,6 +3,7 @@ Reboot scripts!
 Log information and check every cycle!
 Author:yanshuo@inspur.com
 #>
+
 [CmdletBinding()]
 param
 (
@@ -180,14 +181,33 @@ echo "@echo off"|Out-File -Encoding ascii -Append -Force reboot.cmd
 $log_dir=Get-Content "c:\logdir_path.log"
 #get current reboot times!
 [int]$current_loop = Get-Content "$log_dir\current_loop.log"
+#get total max loop count!
 [int]$total_count=Get-Content "$log_dir\loop_count_expect.txt"
+#get sleep time after OS start!
 $time_sleep_sub=Get-Content "$log_dir\sleeptime.txt"
+#get reboot type:warm reboot or DC/AC reboot!
 $reboot_type=Get-Content "c:\reboot_type.log"
-if ($current_loop -lt $total_count)
+
+#get current time minus start time to detemine if longest time reached!
+#get start time
+$start_year=Get-Content "$log_dir\startyear.txt"
+$start_month=Get-Content "$log_dir\startmonth.txt"
+$start_day=Get-Content "$log_dir\startday.txt"
+$start_hour=Get-Content "$log_dir\starthour.txt"
+$start_minute=Get-Content "$log_dir\startminute.txt"
+$start_second=Get-Content "$log_dir\startsecond.txt"
+#get current time
+$current_time=Get-Date 
+#get longest time
+[int]$longest_run_time_sub=Get-Content "$log_dir\longesttime.txt"
+[int]$seconds_last=(New-TimeSpan -Start (Get-Date -Year $start_year -Month $start_month `
+-Day $start_day -Hour $start_hour -Minute $start_minute -Second $start_second) -end $current_time).TotalSeconds
+
+if (($current_loop -lt $total_count) -and ($seconds_last -lt $longest_run_time_sub))
 {
 Start-Sleep -Seconds $time_sleep_sub
 echo "This is $current_loop loop!"|Out-File -Force -Append "$log_dir\reboot.log"
-Get-Date -Format yyyyMMdd_hhmmss|Out-File -Force -Append "$log_dir\reboot.log"
+Get-Date -Format yyyyMMdd_HHmmss|Out-File -Force -Append "$log_dir\reboot.log"
 #cpu
 #cpu number
 $cpu_num_list=Get-WmiObject win32_processor|where {$_.status -eq "OK"}|Select-Object -ExpandProperty status
@@ -626,6 +646,11 @@ else
 Restart-Computer -Force
 }
 }
+else
+{
+Remove-Item "$log_dir\base*" -Force -Recurse
+
+}
 }|Out-File -Force -Encoding ascii reboot.ps1
 }
 
@@ -650,7 +675,7 @@ if (-not (Test-Path c:\rebootlog -PathType Container))
 $null=New-Item -Path "c:\" -Name rebootlog -ItemType Directory 
 }
 #generate directory for log using current date
-$current_date=Get-Date -Format yyyyMMdd_hhmmss
+$current_date=Get-Date -Format yyyyMMdd_HHmmss
 $log_dir="c:\rebootlog\$current_date"
 $null=New-Item -Path "c:\rebootlog" -Name $current_date -ItemType Directory
 echo "$log_dir"|Out-File -Force "c:\logdir_path.log"
@@ -667,8 +692,21 @@ if (($go_or_not -eq "y") -or ($go_or_not -eq "Y"))
 Write-Host "your choise is " -NoNewline
 Write-Host $go_or_not -ForegroundColor Green
 $type_reboot=Read-Host "Please input reboot type: 1-warm reboot; 2-dc&ac"
+
+#decide to use loop count or time last!
+$longest_run_time=Read-Host "Please input the total longest time you want to run(Seconds)"
+echo $longest_run_time|Out-File -Force "$log_dir\longesttime.txt"
+#generate start time(yyyyMMddhhmmss) for time compare!
+Get-Date -Format yyyy|Out-File -Force "$log_dir\startyear.txt"
+Get-Date -Format MM|Out-File -Force "$log_dir\startmonth.txt"
+Get-Date -Format dd|Out-File -Force "$log_dir\startday.txt"
+Get-Date -Format HH|Out-File -Force "$log_dir\starthour.txt"
+Get-Date -Format mm|Out-File -Force "$log_dir\startminute.txt"
+Get-Date -Format ss|Out-File -Force "$log_dir\startsecond.txt"
+
+$loop_count=Read-Host "Please input your max loop count"
 $time_sleep=Read-Host "Please input your reboot sleep time(Seconds)"
-$loop_count=Read-Host "Please input your expect loop count"
+
 if ($type_reboot -eq "1")
 {
 echo "reboot"|Out-File -Encoding ascii -Force "c:\reboot_type.log"
