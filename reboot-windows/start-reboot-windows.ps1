@@ -649,7 +649,7 @@ Restart-Computer -Force
 else
 {
 Remove-Item "$log_dir\base*" -Force -Recurse
-
+Remove-Item -Path "C:\Users\Administrator\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\reboot.cmd" -Force -ErrorAction SilentlyContinue
 }
 }|Out-File -Force -Encoding ascii reboot.ps1
 }
@@ -657,6 +657,8 @@ Remove-Item "$log_dir\base*" -Force -Recurse
 
 #main
 $host.UI.RawUI.BufferSize = new-object System.Management.Automation.Host.Size(175,20000)
+#disable useraccountcontrolsettings
+New-ItemProperty -Path HKLM:Software\Microsoft\Windows\CurrentVersion\policies\system -Name EnableLUA -PropertyType DWord -Value 0 -Force
 #use autologon or not
 $autologon_or_not=Read-Host "If you need to enable autologon! If need, please input y/Y; if not need, please input anything except y/Y!"
 if (($autologon_or_not -eq "y") -or ($autologon_or_not -eq "Y"))

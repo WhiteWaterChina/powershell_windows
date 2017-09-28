@@ -4,7 +4,7 @@
 （2）然后会分别输出base信息供测试人员查看，然后会问是否继续测试。继续测试就输入y或者Y；不继续就输入n或者N。
 （3）分别会提示你输入测试类别（reboot还是dc&ac)、最长测试时间（单位是秒）、进系统后重启的延迟时间（单位秒）、最大重启次数.
 3. 生成的日志会保存在c:\rebootlog文件夹下，以开始测试的时间戳命名的文件夹中（如2017年9月20日 8点10分11秒开始测试，则文件夹为20170920_081011）。最后所有的日志保存在reboot.log中，里面包含汇总的base信息、每一次启动的汇总的硬件信息、每一次重启之后的检测的结果（PASS或者FAIL）。最后测试完成之后只要检查reboot.log文件中无FAIL字符即可。
-4. 如果想要中途停止测试，在进去系统后会出现一个cmd窗口和一个powershell窗口，按ctrl+c结束这两个窗口，然后有两种操作。
+4. 正常测试完成之后自动将开机自动运行功能关闭；如果想要中途停止测试，在进去系统后会出现一个cmd窗口和一个powershell窗口，按ctrl+c结束这两个窗口，即可停止本次自动重启。如果想要永久关闭自动重启，然后有两种操作。
 （1）右键stop-reboot-windows.ps1选择run with powershell来结束测试。
 （2）手动进入到 C:\Users\Administrator\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup ，将里面的reboot.cmd删除即可
 5. 只能用administrator账号来进行测试。
