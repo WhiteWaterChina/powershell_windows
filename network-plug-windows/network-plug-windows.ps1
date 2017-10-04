@@ -43,6 +43,7 @@ Set-Variable -Name flag_plug -Value 0 -Scope 1
 
 function plug_in()
 {
+$loop_count=Get-Content "$log_dir_name\count.log"
 $temp_name_for_in=Get-WmiObject win32_networkadapter|where {$_.physicaladapter -eq "True"}|where{$_.netenabled -ne "True"}|Select-Object -ExpandProperty name
 foreach ($name_for_in in $base_name_for_in)
 {
@@ -69,8 +70,8 @@ Select-Object -ExpandProperty speed
 Write-Host $DEV_name_in -NoNewline -ForegroundColor Green
 Write-Host " is plugged in! Current IPAddress is " -NoNewline
 Write-Host $ipaddress_in  -ForegroundColor Green
-Write-Host "Index of this port is " -NoNewline
-Write-Host $deviceid_index -NoNewline -ForegroundColor Green
+#Write-Host "Index of this port is " -NoNewline
+#Write-Host $deviceid_index -NoNewline -ForegroundColor Green
 Write-Host " ! Current Speed is " -NoNewline
 Write-Host $speed_this_port -NoNewline -ForegroundColor Green
 Write-Host " bit/s!"
@@ -98,20 +99,20 @@ Select-Object -ExpandProperty ServiceName |Out-File -Append -Force "$log_dir_nam
 }
 
 #export information for one cycle to log file "plug.log"
-echo "Below are the infomation for the networks on this machinefor one cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
-echo "Below are the device name for the networks on this machine for one cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
+echo "Below are the infomation for the networks on this machine for $loop_count cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
+echo "Below are the device name for the networks on this machine for $loop_count cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
 Get-Content ".\$log_dir_name\base-devicename.txt"|Out-File -Append -Force "$log_dir_name\plug.log"
-echo "Below are the macadderss for the networks on this machine for one cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
+echo "Below are the macadderss for the networks on this machine for $loop_count cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
 Get-Content ".\$log_dir_name\base-macaddress.txt"|Out-File -Append -Force "$log_dir_nameplug.log"
-echo "Below are the speed for the networks on this machine for one cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
+echo "Below are the speed for the networks on this machine for $loop_count cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
 Get-Content ".\$log_dir_name\base-speed.txt"|Out-File -Append -Force "$log_dir_name\plug.log"
-echo "Below are the device enabled for the networks on this machine for one cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
+echo "Below are the device enabled for the networks on this machine for $loop_count cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
 Get-Content ".\$log_dir_name\base-deviceenabled.txt"|Out-File -Append -Force "$log_dir_name\plug.log"
-echo "Below are the guid for the networks on this machine for one cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
+echo "Below are the guid for the networks on this machine for $loop_count cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
 Get-Content ".\$log_dir_name\base-guid.txt"|Out-File -Append -Force "$log_dir_name\plug.log"
-echo "Below are the manufacturer for the networks on this machine for one cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
+echo "Below are the manufacturer for the networks on this machine for $loop_count cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
 Get-Content ".\$log_dir_name\base-manufacturer.txt"|Out-File -Append -Force "$log_dir_name\plug.log"
-echo "Below are the drivername for the networks on this machine for one cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
+echo "Below are the drivername for the networks on this machine for $loop_count cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
 Get-Content ".\$log_dir_name\base-drivername.txt"|Out-File -Append -Force "$log_dir_name\plug.log"
 #echo "Below are the interfaceindex for the networks on this machine for one cycle!"|Out-File -Append -Force "$log_dir_name\plug.log"
 #Get-Content ".\base-interfaceindex.txt"|Out-File -Append -Force ".\$log_dir_name\plug.log"
@@ -366,8 +367,9 @@ $DEV_name_out_temp_1=1
 $DEV_name_out_temp_2=1
 $DEV_name_in_temp_1=1
 $DEV_name_in_temp_2=1
-[string]$log_dir_name=Get-Date -Format yyyymmdd_hhmmss
+[string]$log_dir_name=Get-Date -Format yyyyMMdd_hhmmss
 $null=New-Item -Name $log_dir_name -ItemType Directory -Force
+echo "1"|Out-File -Force "$log_dir_name\count.log"
 #clear eventlog
 Clear-EventLog -LogName System 
 #generate baseline
@@ -433,6 +435,7 @@ Write-Host "This is " -NoNewline
 Write-Host "$i" -NoNewline -ForegroundColor Green
 Write-Host " times!" 
 Write-Host "Please plug it out!"
+echo $i |Out-File -Force "$log_dir_name\count.log"
 }
 }
 }
