@@ -20,54 +20,32 @@ Write-Host " "
 Write-Host "Below are the base informatin of this machine!" -ForegroundColor Green
 echo "Below are the base informatin of this machine!"|Out-File -Force -Append "$log_dir\reboot.log"
 #cpu info
-#cpu number
-$cpu_num_list=Get-WmiObject win32_processor|where {$_.status -eq "OK"}|Select-Object -ExpandProperty status
-$cpu_num=$cpu_num_list.length
-Write-Host "There are " -NoNewline
-Write-Host $cpu_num -NoNewline -ForegroundColor Green
-Write-Host " CPU on this machine!" 
-echo $cpu_num |Out-File -Force -Append "$log_dir\base_cpu_num.log"
-echo "CPU number:"|Out-File -Force -Append "$log_dir\reboot.log"
-echo $cpu_num |Out-File -Force -Append "$log_dir\reboot.log"
+#show cpu info
+Write-Host " "
+Write-Host "Below are the information about Physical CPU!" -ForegroundColor Green
+Get-WmiObject win32_processor|where {$_.status -eq "OK"}|Sort-Object -Property deviceid|
+Format-Table -Property DeviceID,
+@{name='Name';expression={$_.name}},
+@{name='Core Number';expression={$_.numberofcores}},
+@{name='Threads Number';expression={$_.NumberOfLogicalProcessors}}
 
-#cpu name
-$cpu_name_list=Get-WmiObject win32_processor|where {$_.status -eq "OK"}|Select-Object -ExpandProperty name
-Write-Host "Their names are "
-foreach ($count in $cpu_name_list)
-{
-Write-Host $count.tostring() -ForegroundColor Green
-}
-echo "$cpu_name_list" |Out-File -Force -Append "$log_dir\base_cpu_name.log"
-echo "CPU name:"|Out-File -Force -Append "$log_dir\reboot.log"
-echo $cpu_name_list |Out-File -Force -Append "$log_dir\reboot.log"
+echo "CPU infomation!"|Out-File -Force -Append "$log_dir\reboot.log"
 
-#core number
-$core_list=Get-WmiObject win32_processor|Select-Object -ExpandProperty NumberOfCores 
-[int]$core_num=0
-foreach ($count in $core_list)
-{
-$core_num=$core_num + $count
-}
-Write-Host "There are " -NoNewline
-Write-Host $core_num -NoNewline -ForegroundColor Green
-Write-Host " Cores!"
-echo "$core_num" |Out-File -Force -Append "$log_dir\base_cpu_corenum.log"
-echo "CPU core number:"|Out-File -Force -Append "$log_dir\reboot.log"
-echo $core_num |Out-File -Force -Append "$log_dir\reboot.log"
+(Get-WmiObject win32_processor|where {$_.status -eq "OK"}|Sort-Object -Property deviceid|
+Format-Table -Property DeviceID,
+@{name='Name';expression={$_.name}},
+@{name='Core Number';expression={$_.numberofcores}},
+@{name='Threads Number';expression={$_.NumberOfLogicalProcessors}})|Out-File -Force -Append "$log_dir\reboot.log"
+#generate base file for CPU
+Get-WmiObject win32_processor|where {$_.status -eq "OK"}|Sort-Object -Property deviceid|Select-Object -ExpandProperty deviceid|
+Out-File -Force -Append "$log_dir\base_cpu_deviceid.log"
+Get-WmiObject win32_processor|where {$_.status -eq "OK"}|Sort-Object -Property deviceid|Select-Object -ExpandProperty name|
+Out-File -Force -Append "$log_dir\base_cpu_name.log"
+Get-WmiObject win32_processor|where {$_.status -eq "OK"}|Sort-Object -Property deviceid|Select-Object -ExpandProperty numberofcores|
+Out-File -Force -Append "$log_dir\base_cpu_core.log"
+Get-WmiObject win32_processor|where {$_.status -eq "OK"}|Sort-Object -Property deviceid|Select-Object -ExpandProperty NumberOfLogicalProcessors|
+Out-File -Force -Append "$log_dir\base_cpu_threads.log"
 
-# cpu threads
-$cpu_threads_list=Get-WmiObject win32_processor|Select-Object -ExpandProperty NumberOfLogicalProcessors
-[int]$threads_num=0
-foreach ($count in $cpu_threads_list)
-{
-$threads_num=$threads_num + $count
-}
-Write-Host "There are " -NoNewline
-Write-Host $threads_num -NoNewline -ForegroundColor Green
-Write-Host " Threads!"
-echo $threads_num|Out-File -Force -Append "$log_dir\base_cpu_threadsnum.log"
-echo "CPU Threads Number:"|Out-File -Force -Append "$log_dir\reboot.log"
-echo $threads_num|Out-File -Force -Append "$log_dir\reboot.log"
 
 #memoryinfo
 #show meminfo
@@ -177,6 +155,7 @@ echo "@echo off"|Out-File -Encoding ascii -Append -Force reboot.cmd
 {PowerShell -Command Set-ExecutionPolicy Unrestricted -scope currentuser}|Out-File -Encoding ascii -Append -Force  reboot.cmd
 {Powershell -noprofile -NoExit -command "&{start-process powershell -ArgumentList '-noprofile -file C:\reboot.ps1' -verb RunAs}"}|Out-File -Encoding ascii -Append -Force -NoNewline reboot.cmd
 {
+$host.UI.RawUI.BufferSize = new-object System.Management.Automation.Host.Size(175,20000)
 #get log dir path
 $log_dir=Get-Content "c:\logdir_path.log"
 #get current reboot times!
@@ -209,40 +188,24 @@ Start-Sleep -Seconds $time_sleep_sub
 echo "This is $current_loop loop!"|Out-File -Force -Append "$log_dir\reboot.log"
 Get-Date -Format yyyyMMdd_HHmmss|Out-File -Force -Append "$log_dir\reboot.log"
 #cpu
-#cpu number
-$cpu_num_list=Get-WmiObject win32_processor|where {$_.status -eq "OK"}|Select-Object -ExpandProperty status
-$cpu_num=$cpu_num_list.length
-echo $cpu_num |Out-File -Force -Append "$log_dir\temp_cpu_num.log"
-echo "CPU number:"|Out-File -Force -Append "$log_dir\reboot.log"
-echo $cpu_num |Out-File -Force -Append "$log_dir\reboot.log"
+#generate temp file for CPU
+Get-WmiObject win32_processor|where {$_.status -eq "OK"}|Sort-Object -Property deviceid|Select-Object -ExpandProperty deviceid|
+Out-File -Force -Append "$log_dir\temp_cpu_deviceid.log"
+Get-WmiObject win32_processor|where {$_.status -eq "OK"}|Sort-Object -Property deviceid|Select-Object -ExpandProperty name|
+Out-File -Force -Append "$log_dir\temp_cpu_name.log"
+Get-WmiObject win32_processor|where {$_.status -eq "OK"}|Sort-Object -Property deviceid|Select-Object -ExpandProperty numberofcores|
+Out-File -Force -Append "$log_dir\temp_cpu_core.log"
+Get-WmiObject win32_processor|where {$_.status -eq "OK"}|Sort-Object -Property deviceid|Select-Object -ExpandProperty NumberOfLogicalProcessors|
+Out-File -Force -Append "$log_dir\temp_cpu_threads.log"
 
-#cpu name
-$cpu_name_list=Get-WmiObject win32_processor|where {$_.status -eq "OK"}|Select-Object -ExpandProperty name
-echo "$cpu_name_list" |Out-File -Force -Append "$log_dir\temp_cpu_name.log"
-echo "CPU name:"|Out-File -Force -Append "$log_dir\reboot.log"
-echo $cpu_name_list |Out-File -Force -Append "$log_dir\reboot.log"
+echo "CPU infomation!"|Out-File -Force -Append "$log_dir\reboot.log"
+(Get-WmiObject win32_processor|where {$_.status -eq "OK"}|Sort-Object -Property deviceid|
+Format-Table -Property DeviceID,
+@{name='Name';expression={$_.name}},
+@{name='Core Number';expression={$_.numberofcores}},
+@{name='Threads Number';expression={$_.NumberOfLogicalProcessors}})|Out-File -Force -Append "$log_dir\reboot.log"
 
-#cpu core number
-$core_list=Get-WmiObject win32_processor|Select-Object -ExpandProperty NumberOfCores 
-[int]$core_num=0
-foreach ($count in $core_list)
-{
-$core_num=$core_num + $count
-}
-echo "$core_num" |Out-File -Force -Append "$log_dir\temp_cpu_corenum.log"
-echo "CPU core number:"|Out-File -Force -Append "$log_dir\reboot.log"
-echo $core_num |Out-File -Force -Append "$log_dir\reboot.log"
 
-#cpu threads number
-$cpu_threads_list=Get-WmiObject win32_processor|Select-Object -ExpandProperty NumberOfLogicalProcessors
-[int]$threads_num=0
-foreach ($count in $cpu_threads_list)
-{
-$threads_num=$threads_num + $count
-}
-echo $threads_num|Out-File -Force -Append "$log_dir\temp_cpu_threadsnum.log"
-echo "CPU Threads Number:"|Out-File -Force -Append "$log_dir\reboot.log"
-echo $threads_num|Out-File -Force -Append "$log_dir\reboot.log"
 
 #mem
 Get-WmiObject win32_physicalmemory|Sort-Object -Property devicelocator|Select-Object -ExpandProperty capacity|
@@ -315,10 +278,10 @@ echo "Netork Information"|Out-File -Force -Append "$log_dir\reboot.log"
 
 #get hash for base and temp files
 #base cpu
-$hash_base_cpu_num=Get-FileHash -Path $log_dir\base_cpu_num.log -Algorithm SHA256|Select-Object -ExpandProperty hash
+$hash_base_cpu_deviceid=Get-FileHash -Path $log_dir\base_cpu_deviceid.log -Algorithm SHA256|Select-Object -ExpandProperty hash
 $hash_base_cpu_name=Get-FileHash -Path $log_dir\base_cpu_name.log -Algorithm SHA256|Select-Object -ExpandProperty hash
-$hash_base_cpu_corenum=Get-FileHash -Path $log_dir\base_cpu_corenum.log -Algorithm SHA256|Select-Object -ExpandProperty hash
-$hash_base_cpu_threadsnum=Get-FileHash -Path $log_dir\base_cpu_threadsnum.log -Algorithm SHA256|Select-Object -ExpandProperty hash
+$hash_base_cpu_corenum=Get-FileHash -Path $log_dir\base_cpu_core.log -Algorithm SHA256|Select-Object -ExpandProperty hash
+$hash_base_cpu_threadsnum=Get-FileHash -Path $log_dir\base_cpu_threads.log -Algorithm SHA256|Select-Object -ExpandProperty hash
 #base mem
 $hash_base_mem_size=Get-FileHash -Path $log_dir\base_mem_size.log -Algorithm SHA256|Select-Object -ExpandProperty hash
 $hash_base_mem_speed=Get-FileHash -Path $log_dir\base_mem_speed.log -Algorithm SHA256|Select-Object -ExpandProperty hash
@@ -342,10 +305,10 @@ $hash_base_net_servicename=Get-FileHash -Path $log_dir\base_net_servicename.log 
 #$hash_base_net_netenabled=Get-FileHash -Path $log_dir\base_net_enabled.log -Algorithm SHA256|Select-Object -ExpandProperty hash
 
 #temp cpu
-$hash_temp_cpu_num=Get-FileHash -Path $log_dir\temp_cpu_num.log -Algorithm SHA256|Select-Object -ExpandProperty hash
+$hash_temp_cpu_deviceid=Get-FileHash -Path $log_dir\temp_cpu_deviceid.log -Algorithm SHA256|Select-Object -ExpandProperty hash
 $hash_temp_cpu_name=Get-FileHash -Path $log_dir\temp_cpu_name.log -Algorithm SHA256|Select-Object -ExpandProperty hash
-$hash_temp_cpu_corenum=Get-FileHash -Path $log_dir\temp_cpu_corenum.log -Algorithm SHA256|Select-Object -ExpandProperty hash
-$hash_temp_cpu_threadsnum=Get-FileHash -Path $log_dir\temp_cpu_threadsnum.log -Algorithm SHA256|Select-Object -ExpandProperty hash
+$hash_temp_cpu_corenum=Get-FileHash -Path $log_dir\temp_cpu_core.log -Algorithm SHA256|Select-Object -ExpandProperty hash
+$hash_temp_cpu_threadsnum=Get-FileHash -Path $log_dir\temp_cpu_threads.log -Algorithm SHA256|Select-Object -ExpandProperty hash
 #temp mem
 $hash_temp_mem_size=Get-FileHash -Path $log_dir\temp_mem_size.log -Algorithm SHA256|Select-Object -ExpandProperty hash
 $hash_temp_mem_speed=Get-FileHash -Path $log_dir\temp_mem_speed.log -Algorithm SHA256|Select-Object -ExpandProperty hash
@@ -371,14 +334,14 @@ $hash_temp_net_servicename=Get-FileHash -Path $log_dir\temp_net_servicename.log 
 #compare base and temp file!
 #Remove-Item -Path $log_dir\status.log -Force -ErrorAction SilentlyContinue
 #cpu number
-if ($hash_base_cpu_num -eq $hash_temp_cpu_num)
+if ($hash_base_cpu_deviceid -eq $hash_temp_cpu_deviceid)
 {
-echo "CPU Number check OK!"|Out-File -Append -Force "$log_dir\reboot.log"
+echo "CPU DeviceID check OK!"|Out-File -Append -Force "$log_dir\reboot.log"
 echo "OK" |Out-File -Append -Force "$log_dir\status.log"
 }
 else
 {
-echo "CPU Number check FAIL!"|Out-File -Append -Force "$log_dir\reboot.log"
+echo "CPU DeviceID check FAIL!"|Out-File -Append -Force "$log_dir\reboot.log"
 echo "FAIL" |Out-File -Append -Force "$log_dir\status.log"
 }
 
@@ -395,7 +358,7 @@ echo "FAIL" |Out-File -Append -Force "$log_dir\status.log"
 }
 
 #cpu core number
-if ($hash_base_cpu_corenum -eq $hash_temp_cpu_corenum)
+if ($hash_base_cpu_core -eq $hash_temp_cpu_core)
 {
 echo "CPU Core Number check OK!"|Out-File -Append -Force "$log_dir\reboot.log"
 echo "OK" |Out-File -Append -Force "$log_dir\status.log"
@@ -407,7 +370,7 @@ echo "FAIL" |Out-File -Append -Force "$log_dir\status.log"
 }
 
 #cpu threads number
-if ($hash_base_cpu_threadsnum -eq $hash_temp_cpu_threadsnum)
+if ($hash_base_cpu_threads -eq $hash_temp_cpu_threads)
 {
 echo "CPU Threads Number check OK!"|Out-File -Append -Force "$log_dir\reboot.log"
 echo "OK" |Out-File -Append -Force "$log_dir\status.log"
@@ -658,7 +621,7 @@ Remove-Item -Path "C:\Users\Administrator\AppData\Roaming\Microsoft\Windows\Star
 #main
 $host.UI.RawUI.BufferSize = new-object System.Management.Automation.Host.Size(175,20000)
 #disable useraccountcontrolsettings
-New-ItemProperty -Path HKLM:Software\Microsoft\Windows\CurrentVersion\policies\system -Name EnableLUA -PropertyType DWord -Value 0 -Force
+$null=New-ItemProperty -Path HKLM:Software\Microsoft\Windows\CurrentVersion\policies\system -Name EnableLUA -PropertyType DWord -Value 0 -Force
 #use autologon or not
 $autologon_or_not=Read-Host "If you need to enable autologon! If need, please input y/Y; if not need, please input anything except y/Y!"
 if (($autologon_or_not -eq "y") -or ($autologon_or_not -eq "Y"))
